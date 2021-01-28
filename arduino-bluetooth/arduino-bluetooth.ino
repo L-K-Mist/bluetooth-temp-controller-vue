@@ -1,10 +1,27 @@
 #include <SoftwareSerial.h>
 #include "BluetoothSerial.h" // Our local Bluetooth library
 
+#include "Heater.h"
+#include "Flasher.h"
+#include "TempSensor.h"
+#include "MyThermistor.h"
+#include "MyThermocouple.h"
+#include <AsyncDelay.h>
+
+int thermoSCK = 8;
+int thermoCS = 9;
+int thermoSO = 10;
+MyThermocouple thermoC(thermoSCK, thermoCS, thermoSO);
+TempSensor *tempSensor = &thermoC;
+Flasher hotFlasher(LED_BUILTIN);
+Flasher fanFlasher(12);
+Heater mainHeater(tempSensor, hotFlasher, fanFlasher);
+
+AsyncDelay delay_6s;
+AsyncDelay delay_1s;
+
 const int8_t bluetoothTxPin = 3;
 const int8_t bluetoothRxPin = 4;
-
-SoftwareSerial BluetoothDevice(bluetoothTxPin, bluetoothRxPin);
 
 // onMessageReceived is a callback function.
 // This is where you decide the message logic.
@@ -28,24 +45,44 @@ void onMessageReceived(char * messageParts[3], SoftwareSerial* device){
   if(strcmp(messageParts[0], "getTemp") == 0){
       Serial.println("I must fetch tempC...");
       device->print("TempC: ");
-      // Heater.getTemp(); // You might want to take actions based on messages using other libraries.
+      device->println(mainHeater.getTempC());
+  }
+  if(strcmp(messageParts[0], "getHotState") == 0){
+    device->print("State: ");
+    device->println(mainHeater.getHeaterState());
+  }
+    if(strcmp(messageParts[0], "getCoolState") == 0){
+    device->print("State: ");
+    device->println(mainHeater.getCoolerState());
   }
 }
-// &BluetoothDevice is dependency injection and composition. myBluetooth *has a* BluetoothDevice; and *has a* callback.
+SoftwareSerial BluetoothDevice(bluetoothTxPin, bluetoothRxPin);
 Bluetooth myBluetooth(&BluetoothDevice, onMessageReceived);
 
 void setup() {
+  delay_6s.start(6000, AsyncDelay::MILLIS);
+  delay_1s.start(1000, AsyncDelay::MILLIS);
   Serial.begin(115200); 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
   myBluetooth.setup();
+  mainHeater.setup();
+  mainHeater.setMinMaxTemp(25, 70); // In this case for testing with a cup of hot water.
+  mainHeater.setTargetTemp(55);
   delay(500);
 }
 
 void loop() {
   myBluetooth.loop();
-  delay(1000);
+  if (delay_6s.isExpired()) {
+    delay_6s.repeat();
+  }
+  if (delay_1s.isExpired()) {
+    mainHeater.loop();
+    delay_1s.repeat();
+  }
+  delay(10);
 }
 
 

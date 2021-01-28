@@ -27,7 +27,6 @@ void Bluetooth::receive(){
 
     while (_device->available() > 0 && newData == false) {
         incomingCharacter = _device->read();
-        Serial.print(incomingCharacter);
         if (incomingCharacter == startMarker) {
             receiveInProgress = true;
             break;
