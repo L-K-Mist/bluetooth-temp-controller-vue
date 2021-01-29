@@ -8,9 +8,26 @@ import "chartjs-plugin-streaming";
 import bluetooth from "@/helpers/bluetooth";
 export default {
   extends: Line,
-  mounted() {
-    this.renderChart(
-      {
+  props: {
+    maxTemp: {
+      type: Number,
+      default: 40,
+    },
+    minTemp: {
+      type: Number,
+      default: 20,
+    },
+  },
+  watch: {
+    maxTemp(newVal) {
+      if (newVal >= 10) {
+        this.renderChart(this.chartData, this.chartOptions);
+      }
+    },
+  },
+  computed: {
+    chartData() {
+      return {
         datasets: [
           {
             label: "Dataset 1 (linear interpolation)",
@@ -25,8 +42,10 @@ export default {
             data: [],
           },
         ],
-      },
-      {
+      };
+    },
+    chartOptions() {
+      return {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
@@ -34,10 +53,15 @@ export default {
             {
               type: "realtime",
               realtime: {
-                duration: 20000,
-                refresh: 1000,
-                delay: 2000,
+                duration: 40000,
+                refresh: 4000,
+                delay: 4000,
                 onRefresh: this.onRefresh,
+              },
+              ticks: {
+                steps: 1500,
+                autoskip: true,
+                autoSkipPadding: 30,
               },
             },
           ],
@@ -50,14 +74,18 @@ export default {
                 display: true,
                 beginsAtZero: true,
                 steps: 5,
-                max: 40,
-                min: 20,
+                max: this.maxTemp,
+                min: this.minTemp,
               },
             },
           ],
         },
-      }
-    );
+      };
+    },
+  },
+  mounted() {
+    console.log("this: ", this);
+    this.renderChart(this.chartData, this.chartOptions);
   },
   methods: {
     onRefresh(chart) {

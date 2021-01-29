@@ -38,9 +38,12 @@ void onMessageReceived(char * messageParts[3], SoftwareSerial* device){
       device->println(messageParts[1]);
   }
   if(strcmp(messageParts[0], "setTemp") == 0){ 
+      const double targetTemp = atof(messageParts[1]);
       device->print("Aiming for ");
-      device->print(atof(messageParts[1]));
+      device->print(targetTemp);
       device->println("C");
+      mainHeater.setTargetTemp(targetTemp);
+
   }
   if(strcmp(messageParts[0], "getTemp") == 0){
       Serial.println("I must fetch tempC...");

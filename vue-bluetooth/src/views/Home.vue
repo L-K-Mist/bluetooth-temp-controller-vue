@@ -57,11 +57,15 @@
     </v-card>
     <v-card>
       <v-card-text>
-        <div
-          class="chart-container"
-          style="position: relative; height:40vh; width:80vw; border: 2px dotted blue;"
-        >
-          <temperature-chart></temperature-chart>
+        <div class="chart-container">
+          <v-text-field
+            label="Max Likely Temptarature"
+            v-model="maximumTemp"
+          ></v-text-field>
+          <temperature-chart
+            ref="tempChart"
+            :maxTemp="Number(maximumTemp)"
+          ></temperature-chart>
         </div>
       </v-card-text>
     </v-card>
@@ -79,6 +83,7 @@ export default {
   data: () => ({
     command: "",
     echo: true,
+    maximumTemp: 40,
   }),
   computed: {
     arduinoSays() {
@@ -88,6 +93,18 @@ export default {
       return this.$store.state.bluetooth.isConnected;
     },
   },
+  mounted() {
+    const chart = this.$refs.tempChart;
+    console.log("mounted - chart", chart);
+  },
+  // watch: {
+  //   maximumTemp(newVal) {
+  //     debugger;
+  //     // if (newVal >= 10) {
+  //     //   this.renderChart(this.chartData, this.chartOptions);
+  //     // }
+  //   },
+  // },
   methods: {
     send(message) {
       bluetooth.send(this.echo ? `echo,${message}` : message);
