@@ -53,8 +53,8 @@ export default {
             {
               type: "realtime",
               realtime: {
-                duration: 40000,
-                refresh: 4000,
+                duration: 80000,
+                refresh: 8000,
                 delay: 4000,
                 onRefresh: this.onRefresh,
               },
@@ -89,7 +89,8 @@ export default {
   },
   methods: {
     onRefresh(chart) {
-      bluetooth.send("getTemp");
+      this.$store.dispatch("bluetooth/sendMessage", "getTemp");
+
       const temperature = this.$store.state.bluetooth.message;
       console.log("onRefresh - temperature", temperature);
       chart.config.data.datasets[1].data.push({

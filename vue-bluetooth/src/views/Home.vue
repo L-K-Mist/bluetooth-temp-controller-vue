@@ -58,10 +58,23 @@
     <v-card>
       <v-card-text>
         <div class="chart-container">
-          <v-text-field
-            label="Max Likely Temptarature"
-            v-model="maximumTemp"
-          ></v-text-field>
+          <v-row wrap>
+            <v-text-field
+              class="tight-text-field"
+              label="Max Operating Temptarature"
+              v-model="maximumTemp"
+            ></v-text-field>
+            <v-text-field
+              class="tight-text-field"
+              label="Min Operating Temptarature"
+              v-model="minimumTemp"
+            ></v-text-field>
+            <v-text-field
+              class="tight-text-field"
+              label="Target Temptarature"
+              v-model="targetTemp"
+            ></v-text-field>
+          </v-row>
           <temperature-chart
             ref="tempChart"
             :maxTemp="Number(maximumTemp)"
@@ -83,7 +96,9 @@ export default {
   data: () => ({
     command: "",
     echo: true,
+    targetTemp: 60,
     maximumTemp: 40,
+    minimumTemp: 20,
   }),
   computed: {
     arduinoSays() {
@@ -129,5 +144,9 @@ export default {
   max-width: 200px;
   /* border: 2px dotted blue; */
   margin-right: 10px;
+}
+.tight-text-field.v-text-field {
+  max-width: 200px;
+  margin: 0 30px;
 }
 </style>

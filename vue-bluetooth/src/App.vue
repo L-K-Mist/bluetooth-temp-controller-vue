@@ -43,7 +43,6 @@ export default {
           this.onChange,
           this.onDisconnected
         );
-        this.$store.dispatch("bluetooth/isConnected", true);
       } catch (error) {
         console.error(error.message);
       }

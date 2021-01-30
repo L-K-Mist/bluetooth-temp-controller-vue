@@ -46,7 +46,14 @@ export default {
     let enc = new TextEncoder(); // By default this encodes to utf-8
     // Why the <opening and closing> characters?
     // Went with this guy's example 3 for the reasons he mentions: https://forum.arduino.cc/index.php?topic=396450.0
-    this.characteristic.writeValue(enc.encode(`<${message}>`));
+    if (!this.characteristic) {
+      throw "Not ready for sending yet.";
+    }
+    this.characteristic
+      .writeValue(enc.encode(`<${message}>`))
+      .catch((error) => {
+        console.log("Let's update state to unconnected");
+      });
   },
 };
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

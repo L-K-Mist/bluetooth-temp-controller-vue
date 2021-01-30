@@ -48,6 +48,7 @@ void onMessageReceived(char * messageParts[3], SoftwareSerial* device){
   if(strcmp(messageParts[0], "getTemp") == 0){
       Serial.println("I must fetch tempC...");
       // device->print("TempC: ");
+      mainHeater.checkIsRising();
       device->println(mainHeater.getTempC());
   }
   if(strcmp(messageParts[0], "getHotState") == 0){
@@ -71,7 +72,7 @@ void setup() {
   }
   myBluetooth.setup();
   mainHeater.setup();
-  mainHeater.setMinMaxTemp(25, 70); // In this case for testing with a cup of hot water.
+  mainHeater.setMinMaxTemp(25, 100); // In this case for testing with a cup of hot water.
   mainHeater.setTargetTemp(55);
   delay(500);
 }

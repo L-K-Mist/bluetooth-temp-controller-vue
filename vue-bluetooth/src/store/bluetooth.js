@@ -14,11 +14,19 @@ const actions = {
     message = decoder.decode(message);
     if (message.includes("Hi from arduino")) {
       console.log(`Handshake completed. Arduino says: ${message}`);
+      commit("isConnected", true);
     }
     commit("setMessage", message);
   },
-  sendMessage(_, message) {
-    bluetooth.send(message);
+  sendMessage({ commit }, message) {
+    try {
+      bluetooth.send(message);
+    } catch (error) {
+      if (error.includes("Not ready")) {
+        commit("isConnected", false);
+      }
+      console.error(error);
+    }
   },
   isConnected({ commit }, isConnected) {
     commit("isConnected", isConnected);
