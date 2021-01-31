@@ -24,6 +24,9 @@ export default {
         this.renderChart(this.chartData, this.chartOptions);
       }
     },
+    minTemp() {
+      this.renderChart(this.chartData, this.chartOptions);
+    },
   },
   computed: {
     chartData() {

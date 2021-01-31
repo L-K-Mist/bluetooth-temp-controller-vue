@@ -1,83 +1,48 @@
 <template>
   <div>
+    <dev-mode-only id="text-send-arduino"
+      ><text-send-arduino></text-send-arduino
+    ></dev-mode-only>
     <v-card>
-      <template v-if="isConnected || true">
-        <v-card-title>
-          Send Messages to your Arduino
-        </v-card-title>
-        <v-card-text>
-          <p>
-            The module seems to get
-            <code>DOMException: GATT operation failed for unknown reason</code>
-            on strings longer than 12 characters, even when I changed the
-            numChars on the arduino side. Keep in mind though: you're more
-            likely to be sending commands like <code>getTemp</code> and
-            <code>setTemp,55</code> than full sentences.
-          </p>
-          <v-form>
-            <v-row
-              class="message-module"
-              width="400"
-              align="center"
-              justify="center"
-              wrap
-            >
-              <div class="check-input">
-                <v-text-field
-                  name="name"
-                  label="Message to Arduino"
-                  id="id"
-                  v-model="command"
-                  @keydown.enter="send(command)"
-                  :counter="12"
-                  v-mask="'XXXXXXXXXXXX'"
-                ></v-text-field>
-                <v-checkbox
-                  style="width: 80px;"
-                  v-model="echo"
-                  label="Echo?"
-                ></v-checkbox>
-              </div>
-              <v-btn
-                class="ml-2 send-button"
-                @click="send(command)"
-                color="success"
-                align-self="end"
-                ><v-icon class="mr-3">mdi-send</v-icon> Send</v-btn
-              >
-            </v-row>
-          </v-form>
-          <v-row>
-            <v-col xs="12"
-              >Arduino says: <strong>{{ arduinoSays }}</strong></v-col
-            >
-          </v-row>
-        </v-card-text>
-      </template>
-    </v-card>
-    <v-card>
+      <v-card-title>Temperature Controller</v-card-title>
+      <br />
       <v-card-text>
         <div class="chart-container">
+          <v-row wrap>
+            <v-slider
+              class="generic-slider"
+              label="Target Temptarature"
+              v-model="targetTemp"
+            >
+              <template v-slot:append>
+                <v-text-field
+                  v-model="targetTemp"
+                  ticks
+                  tick-size="4"
+                  class="mt-0 pt-0"
+                  type="number"
+                  style="width: 60px"
+                  suffix="°C"
+                ></v-text-field>
+              </template>
+            </v-slider>
+          </v-row>
           <v-row wrap>
             <v-text-field
               class="tight-text-field"
               label="Max Operating Temptarature"
-              v-model="maximumTemp"
+              v-model.number="maximumTemp"
             ></v-text-field>
             <v-text-field
               class="tight-text-field"
               label="Min Operating Temptarature"
-              v-model="minimumTemp"
-            ></v-text-field>
-            <v-text-field
-              class="tight-text-field"
-              label="Target Temptarature"
-              v-model="targetTemp"
+              v-model.number="minimumTemp"
             ></v-text-field>
           </v-row>
           <temperature-chart
             ref="tempChart"
-            :maxTemp="Number(maximumTemp)"
+            :maxTemp="maximumTemp"
+            :minTemp="minimumTemp"
           ></temperature-chart>
         </div>
       </v-card-text>
@@ -88,65 +53,38 @@
 <script>
 import bluetooth from "@/helpers/bluetooth";
 import TemperatureChart from "@/components/TemperatureChart";
+import DevModeOnly from "@/components/DevModeOnly";
+import TextSendArduino from "@/components/TextSendArduino";
 export default {
   name: "send-string",
   components: {
     TemperatureChart,
+    DevModeOnly,
+    TextSendArduino,
   },
   data: () => ({
-    command: "",
-    echo: true,
     targetTemp: 60,
-    maximumTemp: 40,
+    maximumTemp: 110,
     minimumTemp: 20,
   }),
-  computed: {
-    arduinoSays() {
-      return this.$store.state.bluetooth.message;
-    },
-    isConnected() {
-      return this.$store.state.bluetooth.isConnected;
-    },
-  },
+
   mounted() {
     const chart = this.$refs.tempChart;
     console.log("mounted - chart", chart);
-  },
-  // watch: {
-  //   maximumTemp(newVal) {
-  //     debugger;
-  //     // if (newVal >= 10) {
-  //     //   this.renderChart(this.chartData, this.chartOptions);
-  //     // }
-  //   },
-  // },
-  methods: {
-    send(message) {
-      bluetooth.send(this.echo ? `echo,${message}` : message);
-    },
   },
 };
 </script>
 
 <style>
-.send-button {
-  max-width: 100px;
-}
-.message-module {
-  max-width: 450px;
-  /* border: 2px dotted blue; */
-}
-.check-input {
-  display: inline-flex;
-  /* border: 2px dotted purple; */
-}
-.check-input .v-text-field {
-  max-width: 200px;
-  /* border: 2px dotted blue; */
-  margin-right: 10px;
-}
 .tight-text-field.v-text-field {
   max-width: 200px;
+  margin: 0 30px;
+}
+#text-send-arduino {
+  margin: 0 0 30px 0;
+}
+.generic-slider {
+  max-width: 500px;
   margin: 0 30px;
 }
 </style>
