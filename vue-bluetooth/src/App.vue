@@ -23,7 +23,7 @@ import bluetooth from "@/helpers/bluetooth";
 export default {
   data: () => ({
     message: null,
-    myCharacteristic: null,
+    characteristic: null,
     count: 0,
     command: "",
   }),
@@ -38,11 +38,16 @@ export default {
   methods: {
     async start() {
       try {
-        this.myCharacteristic = await bluetooth.initialize(
-          {},
-          this.onChange,
-          this.onDisconnected
+        this.characteristic = await bluetooth.initialize({
+          // Sticking with the defaults
+        });
+        await this.characteristic.startNotifications();
+        await this.characteristic.addEventListener(
+          "characteristicvaluechanged",
+          this.onChange
         );
+        console.log("Notifications have been started: ", this.characteristic);
+        bluetooth.send("Hi from web"); // Arduino is expecting this message as part of the initial handshake.
       } catch (error) {
         console.error(error.message);
       }
