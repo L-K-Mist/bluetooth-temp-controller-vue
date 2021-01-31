@@ -13,6 +13,7 @@
               class="generic-slider"
               label="Target Temptarature"
               v-model="targetTemp"
+              @change="onNewTargetTemp"
             >
               <template v-slot:append>
                 <v-text-field
@@ -71,6 +72,11 @@ export default {
   mounted() {
     const chart = this.$refs.tempChart;
     console.log("mounted - chart", chart);
+  },
+  methods: {
+    onNewTargetTemp(value) {
+      console.log("onNewTargetTemp - value", value);
+    },
   },
 };
 </script>

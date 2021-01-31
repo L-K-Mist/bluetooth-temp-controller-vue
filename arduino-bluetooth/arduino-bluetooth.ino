@@ -49,6 +49,7 @@ void onMessageReceived(char * messageParts[3], SoftwareSerial* device){
       Serial.println("I must fetch tempC...");
       // device->print("TempC: ");
       mainHeater.checkIsRising();
+      device->print("tempC,");
       device->println(mainHeater.getTempC());
   }
   if(strcmp(messageParts[0], "getHotState") == 0){

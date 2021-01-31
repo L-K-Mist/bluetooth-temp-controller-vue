@@ -5,6 +5,7 @@ const state = {
   message: "",
   isConnected: false,
   clearNext: false,
+  tempC: 26,
 };
 
 const getters = {};
@@ -15,6 +16,11 @@ const actions = {
     if (message.includes("Hi from arduino")) {
       console.log(`Handshake completed. Arduino says: ${message}`);
       commit("isConnected", true);
+    }
+    if (message.includes("tempC")) {
+      // eslint-disable-next-line
+      const regex = /[^0-9\.]+/g; // Pull out the decimal
+      commit("tempC", Number(message.replace(regex, "")));
     }
     commit("setMessage", message);
   },
@@ -47,6 +53,9 @@ const mutations = {
   },
   isConnected(state, isConnected) {
     state.isConnected = isConnected;
+  },
+  tempC(state, tempC) {
+    state.tempC = tempC;
   },
 };
 
