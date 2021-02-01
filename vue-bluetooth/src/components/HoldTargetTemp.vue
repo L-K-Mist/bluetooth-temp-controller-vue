@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="hold-target-temp">
     <v-row wrap>
       <v-slider
         class="generic-slider"
@@ -14,7 +14,7 @@
             tick-size="4"
             class="mt-0 pt-0"
             type="number"
-            style="width: 60px"
+            style="width: 65px"
             suffix="°C"
             @input="updateAll"
           >
@@ -36,7 +36,7 @@
             tick-size="4"
             class="mt-0 pt-0"
             type="number"
-            style="width: 80px"
+            style="width: 50px"
             @input="updateAll"
           >
           </v-text-field>
@@ -108,10 +108,17 @@ export default {
 <style>
 .time-field {
   /* border: 2px dotted blue; */
-  max-width: 150px;
+  max-width: 100px;
 }
 .time-field.v-text-field {
   padding-top: 12px;
-  margin-top: -8px;
+  margin-top: -12px;
+  margin-left: -20px;
+}
+.hold-target-temp .v-input__append-outer {
+  display: inline-flex;
+  margin-bottom: 4px;
+  margin-top: 0px;
+  line-height: 1;
 }
 </style>

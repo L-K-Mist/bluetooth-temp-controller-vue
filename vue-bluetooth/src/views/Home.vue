@@ -3,13 +3,13 @@
     <dev-mode-only id="text-send-arduino"
       ><text-send-arduino></text-send-arduino
     ></dev-mode-only>
-    <v-btn @click color="success">Plus</v-btn>
+    <v-btn @click="addTarget" color="success">Plus</v-btn>
     <v-card>
       <v-card-title>Temperature Controller</v-card-title>
-      <br />
       <v-card-text>
         <div class="chart-container">
           <hold-target-temp
+            class="control-module"
             v-for="(target, index) in tempData"
             :key="index"
             :maximumTemp="maximumTemp"
@@ -57,7 +57,6 @@ export default {
     tempData: [
       { id: 1, targetTemp: 60, timeUnit: "minutes", numberOfTimeUnits: 30 },
     ],
-
     minimumTemp: 20,
     maximumTemp: 110,
   }),
@@ -73,6 +72,12 @@ export default {
     const chart = this.$refs.tempChart;
     console.log("mounted - chart", chart);
   },
+  methods: {
+    addTarget() {
+      const lastTarget = { ...this.tempData[this.tempData.length - 1] };
+      this.tempData.push(lastTarget);
+    },
+  },
 };
 </script>
 
@@ -87,5 +92,11 @@ export default {
 .generic-slider {
   max-width: 500px;
   margin: 0 30px;
+}
+.control-module {
+  border: 1px solid lightblue;
+  border-radius: 12px;
+  padding: 30px 0 15px 0;
+  margin: 0 0 30px 0;
 }
 </style>
