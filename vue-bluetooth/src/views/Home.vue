@@ -3,40 +3,28 @@
     <dev-mode-only id="text-send-arduino"
       ><text-send-arduino></text-send-arduino
     ></dev-mode-only>
+    <v-btn @click="addTarget" color="success">Plus</v-btn>
     <v-card>
       <v-card-title>Temperature Controller</v-card-title>
-      <br />
       <v-card-text>
         <div class="chart-container">
-          <v-row wrap>
-            <v-slider
-              class="generic-slider"
-              label="Target Temptarature"
-              v-model="targetTemp"
-              @change="onNewTargetTemp"
-            >
-              <template v-slot:append>
-                <v-text-field
-                  v-model="targetTemp"
-                  ticks
-                  tick-size="4"
-                  class="mt-0 pt-0"
-                  type="number"
-                  style="width: 60px"
-                  suffix="°C"
-                ></v-text-field>
-              </template>
-            </v-slider>
-          </v-row>
+          <hold-target-temp
+            class="control-module"
+            v-for="(target, index) in tempData"
+            :key="index"
+            :maximumTemp="maximumTemp"
+            :minimumTemp="minimumTemp"
+            v-model="tempData[index]"
+          ></hold-target-temp>
           <v-row wrap>
             <v-text-field
               class="tight-text-field"
-              label="Max Operating Temptarature"
+              label="Max Operating Temperature"
               v-model.number="maximumTemp"
             ></v-text-field>
             <v-text-field
               class="tight-text-field"
-              label="Min Operating Temptarature"
+              label="Min Operating Temperature"
               v-model.number="minimumTemp"
             ></v-text-field>
           </v-row>
@@ -56,26 +44,38 @@ import bluetooth from "@/helpers/bluetooth";
 import TemperatureChart from "@/components/TemperatureChart";
 import DevModeOnly from "@/components/DevModeOnly";
 import TextSendArduino from "@/components/TextSendArduino";
+import HoldTargetTemp from "../components/HoldTargetTemp.vue";
 export default {
   name: "send-string",
   components: {
     TemperatureChart,
     DevModeOnly,
     TextSendArduino,
+    HoldTargetTemp,
   },
   data: () => ({
-    targetTemp: 60,
-    maximumTemp: 110,
+    tempData: [
+      { id: 1, targetTemp: 60, timeUnit: "minutes", numberOfTimeUnits: 30 },
+    ],
     minimumTemp: 20,
+    maximumTemp: 110,
   }),
-
+  watch: {
+    tempData: {
+      handler(val) {
+        console.log("handler - val", val);
+      },
+      deep: true,
+    },
+  },
   mounted() {
     const chart = this.$refs.tempChart;
     console.log("mounted - chart", chart);
   },
   methods: {
-    onNewTargetTemp(value) {
-      console.log("onNewTargetTemp - value", value);
+    addTarget() {
+      const lastTarget = { ...this.tempData[this.tempData.length - 1] };
+      this.tempData.push(lastTarget);
     },
   },
 };
@@ -92,5 +92,11 @@ export default {
 .generic-slider {
   max-width: 500px;
   margin: 0 30px;
+}
+.control-module {
+  border: 1px solid lightblue;
+  border-radius: 12px;
+  padding: 30px 0 15px 0;
+  margin: 0 0 30px 0;
 }
 </style>
